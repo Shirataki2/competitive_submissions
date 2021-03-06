@@ -1,0 +1,85 @@
+[package]
+name = "practice2"
+version = "0.1.0"
+authors = ["Tomoya Ishii <shi2gx@gmail.com>"]
+edition = "2018"
+
+[package.metadata.cargo-compete.bin]
+practice2-a = { alias = "a", problem = "https://atcoder.jp/contests/practice2/tasks/practice2_a" }
+practice2-b = { alias = "b", problem = "https://atcoder.jp/contests/practice2/tasks/practice2_b" }
+practice2-c = { alias = "c", problem = "https://atcoder.jp/contests/practice2/tasks/practice2_c" }
+practice2-d = { alias = "d", problem = "https://atcoder.jp/contests/practice2/tasks/practice2_d" }
+practice2-e = { alias = "e", problem = "https://atcoder.jp/contests/practice2/tasks/practice2_e" }
+practice2-f = { alias = "f", problem = "https://atcoder.jp/contests/practice2/tasks/practice2_f" }
+practice2-g = { alias = "g", problem = "https://atcoder.jp/contests/practice2/tasks/practice2_g" }
+practice2-h = { alias = "h", problem = "https://atcoder.jp/contests/practice2/tasks/practice2_h" }
+practice2-i = { alias = "i", problem = "https://atcoder.jp/contests/practice2/tasks/practice2_i" }
+practice2-j = { alias = "j", problem = "https://atcoder.jp/contests/practice2/tasks/practice2_j" }
+practice2-k = { alias = "k", problem = "https://atcoder.jp/contests/practice2/tasks/practice2_k" }
+practice2-l = { alias = "l", problem = "https://atcoder.jp/contests/practice2/tasks/practice2_l" }
+
+[[bin]]
+name = "practice2-a"
+path = "src/bin/a.rs"
+
+[[bin]]
+name = "practice2-b"
+path = "src/bin/b.rs"
+
+[[bin]]
+name = "practice2-c"
+path = "src/bin/c.rs"
+
+[[bin]]
+name = "practice2-d"
+path = "src/bin/d.rs"
+
+[[bin]]
+name = "practice2-e"
+path = "src/bin/e.rs"
+
+[[bin]]
+name = "practice2-f"
+path = "src/bin/f.rs"
+
+[[bin]]
+name = "practice2-g"
+path = "src/bin/g.rs"
+
+[[bin]]
+name = "practice2-h"
+path = "src/bin/h.rs"
+
+[[bin]]
+name = "practice2-i"
+path = "src/bin/i.rs"
+
+[[bin]]
+name = "practice2-j"
+path = "src/bin/j.rs"
+
+[[bin]]
+name = "practice2-k"
+path = "src/bin/k.rs"
+
+[[bin]]
+name = "practice2-l"
+path = "src/bin/l.rs"
+[dependencies]
+lazy_static = "=1.4.0"
+proconio = { version = "=0.3.6", features = ["derive"] }
+procon               = { git = "https://github.com/Shirataki2/procon_rs", branch = "main" }
+procon_bicoef        = { git = "https://github.com/Shirataki2/procon_rs", branch = "main" }
+procon_complex       = { git = "https://github.com/Shirataki2/procon_rs", branch = "main" }
+procon_graph         = { git = "https://github.com/Shirataki2/procon_rs", branch = "main" }
+procon_fft           = { git = "https://github.com/Shirataki2/procon_rs", branch = "main" }
+procon_itertools     = { git = "https://github.com/Shirataki2/procon_rs", branch = "main" }
+procon_math          = { git = "https://github.com/Shirataki2/procon_rs", branch = "main" }
+procon_math_traits   = { git = "https://github.com/Shirataki2/procon_rs", branch = "main" }
+procon_modint        = { git = "https://github.com/Shirataki2/procon_rs", branch = "main" }
+procon_multiset      = { git = "https://github.com/Shirataki2/procon_rs", branch = "main" }
+procon_ntt           = { git = "https://github.com/Shirataki2/procon_rs", branch = "main" }
+procon_segtree       = { git = "https://github.com/Shirataki2/procon_rs", branch = "main" }
+procon_shortest_path = { git = "https://github.com/Shirataki2/procon_rs", branch = "main" }
+procon_string        = { git = "https://github.com/Shirataki2/procon_rs", branch = "main" }
+procon_unionfind     = { git = "https://github.com/Shirataki2/procon_rs", branch = "main" }

@@ -1,0 +1,47 @@
+[package]
+name = "checker"
+version = "0.1.0"
+authors = ["Shirataki2 <ahahah114514@gmail.com>"]
+edition = "2018"
+
+[package.metadata.cargo-compete]
+config = "../compete.toml"
+
+[package.metadata.cargo-compete.bin]
+checker = {name = "checker-checker",problem = "https://atcoder.jp/contests/checker/<FIXME: screen name of the problem>"}
+convolution = {name = "checker-convolution",problem = "https://atcoder.jp/contests/checker/<FIXME: screen name of the problem>"}
+convolution2 = {name = "checker-convolution2",problem = "https://atcoder.jp/contests/checker/<FIXME: screen name of the problem>"}
+inv_fps = {name = "checker-inv_fps",problem = "https://atcoder.jp/contests/checker/<FIXME: screen name of the problem>"}
+point_add_range_sum = {name = "checker-point_add_range_sum",problem = "https://atcoder.jp/contests/checker/<FIXME: screen name of the problem>"}
+static_range_sum = {name = "checker-static_range_sum",problem = "https://atcoder.jp/contests/checker/<FIXME: screen name of the problem>"}
+static_rmq = {name = "checker-static_rmq",problem = "https://atcoder.jp/contests/checker/<FIXME: screen name of the problem>"}
+suffix_array = {name = "checker-suffix_array",problem = "https://atcoder.jp/contests/checker/<FIXME: screen name of the problem>"}
+union_find = {name = "checker-union_find",problem = "https://atcoder.jp/contests/checker/<FIXME: screen name of the problem>"}
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+[[bin]]
+name = "suffix_array"
+path = "src/suffix_array.rs"
+[[bin]]
+name = "union_find"
+path = "src/union_find.rs"
+[[bin]]
+name = "static_range_sum"
+path = "src/static_range_sum.rs"
+[[bin]]
+name = "static_rmq"
+path = "src/static_rmq.rs"
+[[bin]]
+name = "point_add_range_sum"
+path = "src/point_add_range_sum.rs"
+[[bin]]
+name = "convolution"
+path = "src/convolution.rs"
+[[bin]]
+name = "convolution2"
+path = "src/convolution2.rs"
+[[bin]]
+name = "inv_fps"
+path = "src/inv_fps.rs"

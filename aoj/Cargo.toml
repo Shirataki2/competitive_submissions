@@ -1,0 +1,76 @@
+[package]
+name = "aoj"
+version = "0.1.0"
+authors = ["Shirataki2 <ahahah114514@gmail.com>"]
+edition = "2018"
+
+[package.metadata.cargo-compete]
+config = "../compete.toml"
+
+[package.metadata.cargo-compete.bin]
+aoj = {name = "aoj-aoj",problem = "https://atcoder.jp/contests/aoj/<FIXME: screen name of the problem>"}
+dsl1a = {name = "aoj-dsl1a",problem = "https://atcoder.jp/contests/aoj/<FIXME: screen name of the problem>"}
+dsl1b = {name = "aoj-dsl1b",problem = "https://atcoder.jp/contests/aoj/<FIXME: screen name of the problem>"}
+grl1a = {name = "aoj-grl1a",problem = "https://atcoder.jp/contests/aoj/<FIXME: screen name of the problem>"}
+grl1b = {name = "aoj-grl1b",problem = "https://atcoder.jp/contests/aoj/<FIXME: screen name of the problem>"}
+grl1c = {name = "aoj-grl1c",problem = "https://atcoder.jp/contests/aoj/<FIXME: screen name of the problem>"}
+grl2a = {name = "aoj-grl2a",problem = "https://atcoder.jp/contests/aoj/<FIXME: screen name of the problem>"}
+grl2a-2 = {name = "aoj-grl2a-2",problem = "https://atcoder.jp/contests/aoj/<FIXME: screen name of the problem>"}
+grl3a = {name = "aoj-grl3a",problem = "https://atcoder.jp/contests/aoj/<FIXME: screen name of the problem>"}
+grl3b = {name = "aoj-grl3b",problem = "https://atcoder.jp/contests/aoj/<FIXME: screen name of the problem>"}
+grl3c = {name = "aoj-grl3c",problem = "https://atcoder.jp/contests/aoj/<FIXME: screen name of the problem>"}
+grl4a = {name = "aoj-grl4a",problem = "https://atcoder.jp/contests/aoj/<FIXME: screen name of the problem>"}
+grl4b = {name = "aoj-grl4b",problem = "https://atcoder.jp/contests/aoj/<FIXME: screen name of the problem>"}
+grl6a = {name = "aoj-grl6a",problem = "https://atcoder.jp/contests/aoj/<FIXME: screen name of the problem>"}
+grl6a-2 = {name = "aoj-grl6a-2",problem = "https://atcoder.jp/contests/aoj/<FIXME: screen name of the problem>"}
+ntl1a = {name = "aoj-ntl1a",problem = "https://atcoder.jp/contests/aoj/<FIXME: screen name of the problem>"}
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+
+[[bin]]
+name = "dsl1a"
+path = "src/dsl1a.rs"
+[[bin]]
+name = "dsl1b"
+path = "src/dsl1b.rs"
+[[bin]]
+name = "grl1a"
+path = "src/grl1a.rs"
+[[bin]]
+name = "ntl1a"
+path = "src/ntl1a.rs"
+[[bin]]
+name = "grl1b"
+path = "src/grl1b.rs"
+[[bin]]
+name = "grl1c"
+path = "src/grl1c.rs"
+[[bin]]
+name = "grl2a"
+path = "src/grl2a.rs"
+[[bin]]
+name = "grl2a-2"
+path = "src/grl2a-2.rs"
+[[bin]]
+name = "grl3a"
+path = "src/grl3a.rs"
+[[bin]]
+name = "grl3b"
+path = "src/grl3b.rs"
+[[bin]]
+name = "grl3c"
+path = "src/grl3c.rs"
+[[bin]]
+name = "grl4a"
+path = "src/grl4a.rs"
+[[bin]]
+name = "grl4b"
+path = "src/grl4b.rs"
+[[bin]]
+name = "grl6a"
+path = "src/grl6a.rs"
+[[bin]]
+name = "grl6a-2"
+path = "src/grl6a-2.rs"

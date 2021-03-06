@@ -1,0 +1,37 @@
+[workspace]
+
+members = [
+    "tools"
+]
+
+[package]
+name = "ahc001"
+version = "0.1.0"
+authors = ["Tomoya Ishii <shi2gx@gmail.com>"]
+edition = "2018"
+
+[package.metadata.cargo-compete.bin]
+ahc001-a = { alias = "a", problem = "https://atcoder.jp/contests/ahc001/tasks/ahc001_a" }
+
+[[bin]]
+name = "ahc001-a"
+path = "src/bin/a.rs"
+[dependencies]
+lazy_static = "=1.4.0"
+proconio = { version = "=0.3.6", features = ["derive"] }
+procon               = { git = "https://github.com/Shirataki2/procon_rs", branch = "main" }
+procon_bicoef        = { git = "https://github.com/Shirataki2/procon_rs", branch = "main" }
+procon_complex       = { git = "https://github.com/Shirataki2/procon_rs", branch = "main" }
+procon_graph         = { git = "https://github.com/Shirataki2/procon_rs", branch = "main" }
+procon_fft           = { git = "https://github.com/Shirataki2/procon_rs", branch = "main" }
+procon_itertools     = { git = "https://github.com/Shirataki2/procon_rs", branch = "main" }
+procon_lazy_segtree  = { git = "https://github.com/Shirataki2/procon_rs", branch = "main" }
+procon_math          = { git = "https://github.com/Shirataki2/procon_rs", branch = "main" }
+procon_math_traits   = { git = "https://github.com/Shirataki2/procon_rs", branch = "main" }
+procon_modint        = { git = "https://github.com/Shirataki2/procon_rs", branch = "main" }
+procon_multiset      = { git = "https://github.com/Shirataki2/procon_rs", branch = "main" }
+procon_ntt           = { git = "https://github.com/Shirataki2/procon_rs", branch = "main" }
+procon_segtree       = { git = "https://github.com/Shirataki2/procon_rs", branch = "main" }
+procon_shortest_path = { git = "https://github.com/Shirataki2/procon_rs", branch = "main" }
+procon_string        = { git = "https://github.com/Shirataki2/procon_rs", branch = "main" }
+procon_unionfind     = { git = "https://github.com/Shirataki2/procon_rs", branch = "main" }

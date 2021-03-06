@@ -1,0 +1,1206 @@
+//! # Bundled libraries
+//!
+//! - `procon_bicoef 0.1.0 (git+https://github.com/Shirataki2/procon_rs?branch=main#30cdf3a9cecc82f578744bed759bbf86d4e3ac08)`      licensed under `MIT` as `crate::procon_bicoef`
+//! - `procon_math_traits 0.1.0 (git+https://github.com/Shirataki2/procon_rs?branch=main#30cdf3a9cecc82f578744bed759bbf86d4e3ac08)` licensed under `MIT` as `crate::procon_math_traits`
+//! - `procon_modint 0.1.0 (git+https://github.com/Shirataki2/procon_rs?branch=main#30cdf3a9cecc82f578744bed759bbf86d4e3ac08)`      licensed under `MIT` as `crate::procon_modint`
+
+#![allow(unused_imports)]
+#![allow(unused_macros)]
+#![allow(dead_code)]
+use proconio::{input, marker::*};
+use std::cmp::*;
+use std::collections::*;
+
+use procon_bicoef::ModBicoef;
+use procon_modint::{set_modint, DynamicModInt};
+
+/// y = kのとき
+/// T(k) = C(c1+k, k) + C(c1+1+k, k) + ... + C(c2+k, k) を求めればよい
+/// S(k) = \sum_{i=0}^{N} C(i+k, k)
+///      = C(N+k+1, k + 1)
+/// T(k) = S(c2) - S(c1-1)
+/// が成立(矩形上の経路を考察する)する
+fn main() {
+    set_modint(1_000_000_007i64);
+    let c = ModBicoef::small_new(2_000_001);
+    input!(c1: usize, r1: usize, c2: usize, r2: usize);
+    let mut ans = DynamicModInt::new(0);
+    for y in r1..=r2 {
+        ans += c.comb(c2 + y + 1, y + 1) - c.comb(c1 + y, y + 1);
+    }
+    println!("{}", ans.value());
+}
+
+// The following code was expanded by `cargo-equip`.
+
+#[allow(unused)]
+pub mod procon_bicoef {
+    mod __pseudo_extern_prelude {
+        pub(super) use crate::procon_modint as __procon_modint;
+    }
+    use self::__pseudo_extern_prelude::*;
+
+    use crate::procon_modint as modint;
+
+    use modint::{DynamicModInt, ModuloInteger};
+
+    pub type ModBicoef = Bicoef<DynamicModInt>;
+
+    #[derive(Debug)]
+    pub enum Bicoef<M: ModuloInteger> {
+        SmallN(SmallNCombination<M>),
+        LargeN(LargeNCombination<M>),
+    }
+
+    impl<M: ModuloInteger> Bicoef<M> {
+        pub fn small_new(n: usize) -> Bicoef<M> {
+            let c = SmallNCombination::<M>::new(n);
+            Bicoef::SmallN(c)
+        }
+
+        pub fn large_new(n: usize, r: usize) -> Bicoef<M> {
+            let c = LargeNCombination::<M>::new(n, r);
+            Bicoef::LargeN(c)
+        }
+
+        pub fn comb(&self, n: usize, r: usize) -> M {
+            use Bicoef::*;
+            match self {
+                SmallN(c) => c.comb(n, r),
+                LargeN(c) => {
+                    assert_eq!(c.n, n);
+                    c.comb(r)
+                }
+            }
+        }
+    }
+
+    #[derive(Debug)]
+    pub struct SmallNCombination<M: ModuloInteger> {
+        pub fact: Vec<M>,
+        pub finv: Vec<M>,
+        pub inv: Vec<M>,
+    }
+
+    impl<M: ModuloInteger> SmallNCombination<M> {
+        pub fn new(max: usize) -> SmallNCombination<M> {
+            let mut fact = vec![M::one(); max + 1];
+            let mut finv = vec![M::one(); max + 1];
+            let mut inv = vec![M::one(); max + 1];
+            for i in 1..=max {
+                fact[i] = fact[i - 1] * (i as i64).into();
+            }
+            finv[max] /= fact[max];
+            for i in (0..max).rev() {
+                finv[i] = finv[i + 1] * ((i + 1) as i64).into();
+            }
+            for i in 1..=max {
+                inv[i] = finv[i] * fact[i - 1];
+            }
+            Self { fact, finv, inv }
+        }
+
+        pub fn perm(&self, n: usize, r: usize) -> M {
+            if n < r {
+                M::zero()
+            } else {
+                self.fact[n] * self.finv[n - r]
+            }
+        }
+
+        pub fn comb(&self, n: usize, r: usize) -> M {
+            if n < r {
+                M::zero()
+            } else {
+                self.fact[n] * self.finv[r] * self.finv[n - r]
+            }
+        }
+
+        pub fn multicomb(&self, n: usize, r: usize) -> M {
+            if r == 0 {
+                M::one()
+            } else {
+                self.comb(n + r - 1, r)
+            }
+        }
+    }
+
+    #[derive(Debug)]
+    pub struct LargeNCombination<M: ModuloInteger> {
+        pub n: usize,
+        com: Vec<M>,
+    }
+
+    impl<M: ModuloInteger> LargeNCombination<M> {
+        pub fn new(n: usize, r_max: usize) -> LargeNCombination<M> {
+            let mut fact = vec![M::one(); r_max + 1];
+            let mut finv = vec![M::one(); r_max + 1];
+            let mut inv = vec![M::one(); r_max + 1];
+            for i in 1..=r_max {
+                fact[i] = fact[i - 1] * (i as i64).into();
+            }
+            finv[r_max] /= fact[r_max];
+            for i in (0..r_max).rev() {
+                finv[i] = finv[i + 1] * ((i + 1) as i64).into();
+            }
+            for i in 1..=r_max {
+                inv[i] = finv[i] * fact[i - 1];
+            }
+            let mut com = vec![M::one(); r_max + 1];
+            com[0] = M::one();
+            for i in 1..=r_max {
+                com[i] = com[i - 1] * ((n - i + 1) as i64).into() * inv[i];
+            }
+            Self { n, com }
+        }
+
+        pub fn comb(&self, r: usize) -> M {
+            self.com[r]
+        }
+    }
+}
+
+#[allow(unused)]
+pub mod procon_math_traits {
+    use std::{
+        fmt,
+        iter::{Product, Sum},
+        marker::PhantomData,
+        ops::*,
+    };
+
+    pub trait Zero {
+        fn zero() -> Self;
+    }
+
+    pub trait One {
+        fn one() -> Self;
+    }
+
+    pub trait Signed {
+        fn abs() -> Self;
+    }
+
+    pub trait Unsigned {}
+
+    pub trait BoundedBelow {
+        fn minimum() -> Self;
+    }
+
+    pub trait BoundedAbove {
+        fn maximum() -> Self;
+    }
+
+    pub trait Monoid {
+        type T: Clone;
+        fn id() -> Self::T;
+        fn op(lhs: &Self::T, rhs: &Self::T) -> Self::T;
+    }
+
+    pub trait Bounded: BoundedBelow + BoundedAbove {}
+
+    impl<T: BoundedBelow + BoundedAbove + ?Sized> Bounded for T {}
+
+    pub trait PrimitiveInteger:
+        'static
+        + Copy
+        + Clone
+        + Ord
+        + Eq
+        + Send
+        + Sync
+        + Not<Output = Self>
+        + Add<Output = Self>
+        + Sub<Output = Self>
+        + Mul<Output = Self>
+        + Div<Output = Self>
+        + Rem<Output = Self>
+        + AddAssign
+        + SubAssign
+        + MulAssign
+        + DivAssign
+        + RemAssign
+        + Sum
+        + Product
+        + Zero
+        + One
+        + Bounded
+        + BitOr<Output = Self>
+        + BitAnd<Output = Self>
+        + BitXor<Output = Self>
+        + BitOrAssign
+        + BitAndAssign
+        + BitXorAssign
+        + Shl<Output = Self>
+        + Shr<Output = Self>
+        + ShlAssign
+        + ShrAssign
+        + fmt::Display
+        + fmt::Debug
+        + fmt::Binary
+        + fmt::Octal
+    {
+    }
+
+    macro_rules! fn_float {
+        ($($f: ident)*) => {
+            $(fn $f(self) -> Self;)*
+        };
+    }
+
+    pub trait PrimitiveFloating:
+        'static
+        + Copy
+        + Clone
+        + PartialEq
+        + PartialOrd
+        + Send
+        + Sync
+        + Neg<Output = Self>
+        + Add<Output = Self>
+        + Sub<Output = Self>
+        + Mul<Output = Self>
+        + Div<Output = Self>
+        + Rem<Output = Self>
+        + AddAssign
+        + SubAssign
+        + MulAssign
+        + DivAssign
+        + RemAssign
+        + Sum
+        + Product
+        + Zero
+        + One
+        + fmt::Display
+        + fmt::Debug
+    {
+        fn_float!(
+            floor ceil round trunc fract abs signum sqrt
+            exp exp2 ln log2 log10 cbrt sin cos tan
+            asin acos atan exp_m1 ln_1p sinh cosh tanh
+            asinh acosh atanh recip to_degrees to_radians
+        );
+
+        fn cast_f32(v: f32) -> Self;
+        fn cast_f64(v: f64) -> Self;
+
+        fn sin_cos(self) -> (Self, Self);
+        fn atan2(self, rhs: Self) -> Self;
+        fn hypot(self, rhs: Self) -> Self;
+
+        fn eps() -> Self;
+        fn pi() -> Self;
+        fn pi_deg() -> Self;
+        fn tau() -> Self;
+        fn tau_deg() -> Self;
+    }
+
+    pub trait Field:
+        'static
+        + Copy
+        + Clone
+        + PartialEq
+        + PartialOrd
+        + Send
+        + Sync
+        + Add<Output = Self>
+        + Sub<Output = Self>
+        + Mul<Output = Self>
+        + Div<Output = Self>
+        + Rem<Output = Self>
+        + AddAssign
+        + SubAssign
+        + MulAssign
+        + DivAssign
+        + RemAssign
+        + Sum
+        + Product
+        + Zero
+        + One
+    {
+    }
+
+    impl<T> Field for T where
+        T: 'static
+            + Copy
+            + Clone
+            + PartialEq
+            + PartialOrd
+            + Send
+            + Sync
+            + Add<Output = Self>
+            + Sub<Output = Self>
+            + Mul<Output = Self>
+            + Div<Output = Self>
+            + Rem<Output = Self>
+            + AddAssign
+            + SubAssign
+            + MulAssign
+            + DivAssign
+            + RemAssign
+            + Sum
+            + Product
+            + Zero
+            + One
+    {
+    }
+
+    macro_rules! impl_primitive_integer {
+        ($($t : ty)*) => {$(
+            impl Zero for $t {
+                #[inline]
+                fn zero() -> Self {
+                    0
+                }
+            }
+
+            impl One for $t {
+                #[inline]
+                fn one() -> Self {
+                    1
+                }
+            }
+
+            impl BoundedBelow for $t {
+                #[inline]
+                fn minimum() -> Self {
+                    Self::min_value()
+                }
+            }
+
+            impl BoundedAbove for $t {
+                fn maximum() -> Self {
+                    Self::max_value()
+                }
+            }
+
+            impl PrimitiveInteger for $t {}
+        )*}
+    }
+
+    macro_rules! forward {
+        ($( Self :: $method:ident ( self $( , $arg:ident : $ty:ty )* ) -> $ret:ty ; )*)
+        => {$(
+            #[inline]
+            fn $method(self $( , $arg : $ty )* ) -> $ret {
+                Self::$method(self $( , $arg )* )
+            }
+        )*};
+        ($( $base:ident :: $method:ident ( self $( , $arg:ident : $ty:ty )* ) -> $ret:ty ; )*)
+        => {$(
+            #[inline]
+            fn $method(self $( , $arg : $ty )* ) -> $ret {
+                <Self as $base>::$method(self $( , $arg )* )
+            }
+        )*};
+        ($( $base:ident :: $method:ident ( $( $arg:ident : $ty:ty ),* ) -> $ret:ty ; )*)
+        => {$(
+            #[inline]
+            fn $method( $( $arg : $ty ),* ) -> $ret {
+                <Self as $base>::$method( $( $arg ),* )
+            }
+        )*}
+    }
+
+    macro_rules! impl_primitive_floating {
+        ($($t : tt)*) => {$(
+            impl Zero for $t {
+                #[inline]
+                fn zero() -> Self {
+                    0.0
+                }
+            }
+
+            impl One for $t {
+                #[inline]
+                fn one() -> Self {
+                    1.0
+                }
+            }
+
+            impl PrimitiveFloating for $t {
+                forward! {
+                    Self::floor(self) -> Self;
+                    Self::ceil(self) -> Self;
+                    Self::round(self) -> Self;
+                    Self::trunc(self) -> Self;
+                    Self::fract(self) -> Self;
+                    Self::abs(self) -> Self;
+                    Self::signum(self) -> Self;
+                    Self::recip(self) -> Self;
+                    Self::sqrt(self) -> Self;
+                    Self::exp(self) -> Self;
+                    Self::exp2(self) -> Self;
+                    Self::ln(self) -> Self;
+                    Self::log2(self) -> Self;
+                    Self::log10(self) -> Self;
+                    Self::to_degrees(self) -> Self;
+                    Self::to_radians(self) -> Self;
+                    Self::cbrt(self) -> Self;
+                    Self::hypot(self, other: Self) -> Self;
+                    Self::sin(self) -> Self;
+                    Self::cos(self) -> Self;
+                    Self::tan(self) -> Self;
+                    Self::asin(self) -> Self;
+                    Self::acos(self) -> Self;
+                    Self::atan(self) -> Self;
+                    Self::atan2(self, other: Self) -> Self;
+                    Self::sin_cos(self) -> (Self, Self);
+                    Self::exp_m1(self) -> Self;
+                    Self::ln_1p(self) -> Self;
+                    Self::sinh(self) -> Self;
+                    Self::cosh(self) -> Self;
+                    Self::tanh(self) -> Self;
+                    Self::asinh(self) -> Self;
+                    Self::acosh(self) -> Self;
+                    Self::atanh(self) -> Self;
+                }
+
+                fn eps() -> Self { std::$t::EPSILON }
+                fn pi() -> Self { std::$t::consts::PI }
+                fn pi_deg() -> Self { 180.0 }
+                fn tau() -> Self { std::$t::consts::PI * 2.0 }
+                fn tau_deg() -> Self { 360.0 }
+
+                fn cast_f32(v: f32) -> $t {
+                    v as $t
+                }
+
+                fn cast_f64(v: f64) -> $t {
+                    v as $t
+                }
+            }
+        )*}
+    }
+
+    impl_primitive_integer!(u8 u16 u32 u64 u128 usize i8 i16 i32 i64 i128 isize);
+    impl_primitive_floating!(f32 f64);
+
+    pub struct Additive<T>(PhantomData<fn() -> T>);
+    impl<T> Monoid for Additive<T>
+    where
+        T: Copy + Add<Output = T> + Zero,
+    {
+        type T = T;
+        fn id() -> Self::T {
+            T::zero()
+        }
+        fn op(a: &T, b: &T) -> Self::T {
+            *a + *b
+        }
+    }
+
+    pub struct Multiplicative<T>(PhantomData<fn() -> T>);
+    impl<T> Monoid for Multiplicative<T>
+    where
+        T: Copy + Mul<Output = T> + One,
+    {
+        type T = T;
+        fn id() -> T {
+            T::one()
+        }
+        fn op(a: &T, b: &T) -> T {
+            *a * *b
+        }
+    }
+
+    pub struct Minimum<T>(PhantomData<fn() -> T>);
+    impl<T> Monoid for Minimum<T>
+    where
+        T: Clone + BoundedAbove + Ord,
+    {
+        type T = T;
+        fn id() -> T {
+            T::maximum()
+        }
+
+        fn op(a: &T, b: &T) -> T {
+            std::cmp::min(a.clone(), b.clone())
+        }
+    }
+
+    pub struct Maximum<T>(PhantomData<fn() -> T>);
+    impl<T> Monoid for Maximum<T>
+    where
+        T: Clone + BoundedBelow + Ord,
+    {
+        type T = T;
+        fn id() -> T {
+            T::minimum()
+        }
+
+        fn op(a: &T, b: &T) -> T {
+            std::cmp::max(a.clone(), b.clone())
+        }
+    }
+
+    pub struct Gcd<T>(PhantomData<fn() -> T>);
+    impl<T: PrimitiveInteger> Monoid for Gcd<T> {
+        type T = T;
+        fn id() -> T {
+            T::zero()
+        }
+        fn op(a: &T, b: &T) -> T {
+            let r = *a % *b;
+            if r == T::zero() {
+                *b
+            } else {
+                Self::op(b, &r)
+            }
+        }
+    }
+
+    pub struct Xor<T>(PhantomData<fn() -> T>);
+    impl<T: PrimitiveInteger> Monoid for Xor<T> {
+        type T = T;
+        fn id() -> T {
+            T::zero()
+        }
+        fn op(a: &T, b: &T) -> T {
+            *a ^ *b
+        }
+    }
+}
+
+#[allow(unused)]
+pub mod procon_modint {
+    mod __pseudo_extern_prelude {
+        pub(super) use crate::procon_math_traits as __procon_math_traits;
+    }
+    use self::__pseudo_extern_prelude::*;
+
+    use crate::procon_math_traits as math_traits;
+
+    use std::cell::RefCell;
+    use std::marker::PhantomData;
+    use std::mem::swap;
+    use std::ops::*;
+
+    use math_traits::{One, Zero};
+
+    pub type ModInt = DynamicModInt;
+    pub type ModInt167772161 = StaticModInt<Mod167772161>;
+    pub type ModInt469762049 = StaticModInt<Mod469762049>;
+    pub type ModInt924844033 = StaticModInt<Mod924844033>;
+    pub type ModInt998244353 = StaticModInt<Mod998244353>;
+    pub type ModInt1012924417 = StaticModInt<Mod1012924417>;
+    pub type ModInt1224736769 = StaticModInt<Mod1224736769>;
+
+    type Num = i64;
+
+    pub trait ModuloInteger:
+        Copy
+        + Clone
+        + Ord
+        + Eq
+        + Add<Output = Self>
+        + Sub<Output = Self>
+        + Mul<Output = Self>
+        + Div<Output = Self>
+        + AddAssign
+        + SubAssign
+        + MulAssign
+        + DivAssign
+        + Zero
+        + One
+        + From<Num>
+    {
+        type Int: Sized;
+        fn modulo(&self) -> Self::Int;
+    }
+
+    impl Zero for DynamicModInt {
+        fn zero() -> Self {
+            DynamicModInt::new(0)
+        }
+    }
+
+    impl One for DynamicModInt {
+        fn one() -> Self {
+            DynamicModInt::new(1)
+        }
+    }
+
+    impl From<Num> for DynamicModInt {
+        fn from(num: Num) -> Self {
+            Self::new(num)
+        }
+    }
+
+    impl ModuloInteger for DynamicModInt {
+        type Int = Num;
+        fn modulo(&self) -> Num {
+            modulo()
+        }
+    }
+
+    impl<M: ModuloPrimitive> Zero for StaticModInt<M> {
+        fn zero() -> Self {
+            Self::new(0)
+        }
+    }
+
+    impl<M: ModuloPrimitive> One for StaticModInt<M> {
+        fn one() -> Self {
+            Self::new(1)
+        }
+    }
+
+    impl<M: ModuloPrimitive> From<Num> for StaticModInt<M> {
+        fn from(num: Num) -> Self {
+            Self::new(num)
+        }
+    }
+
+    impl<M: ModuloPrimitive + Ord> ModuloInteger for StaticModInt<M> {
+        type Int = Num;
+
+        fn modulo(&self) -> Self::Int {
+            M::modulo()
+        }
+    }
+
+    thread_local! {
+        static MOD: RefCell<Num> = RefCell::new(0);
+    }
+
+    pub fn set_modint<T>(v: T)
+    where
+        Num: From<T>,
+    {
+        MOD.with(|x| x.replace(Num::from(v)));
+    }
+
+    pub fn modulo() -> Num {
+        MOD.with(|x| *x.borrow())
+    }
+
+    #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+    pub struct DynamicModInt(Num);
+
+    impl DynamicModInt {
+        pub fn new<T>(v: T) -> DynamicModInt
+        where
+            Num: From<T>,
+        {
+            let mut v = Num::from(v);
+            let m = modulo();
+            if v >= m {
+                v %= m;
+            }
+            if v < 0 {
+                v = (v % m + m) % m;
+            }
+            DynamicModInt(v)
+        }
+
+        fn internal_pow(&self, mut e: Num) -> DynamicModInt {
+            let mut result = 1;
+            let mut cur = self.0;
+            let m = modulo();
+            while e > 0 {
+                if e & 1 == 1 {
+                    result *= cur;
+                    result %= m;
+                }
+                e >>= 1;
+                cur = (cur * cur) % m;
+            }
+            DynamicModInt(result)
+        }
+
+        pub fn pow<T>(&self, e: T) -> DynamicModInt
+        where
+            Num: From<T>,
+        {
+            self.internal_pow(Num::from(e))
+        }
+
+        pub fn value(&self) -> Num {
+            self.0
+        }
+
+        pub fn inv(&self) -> Self {
+            let (mut a, mut b, mut u, mut v) = (self.0, modulo(), 1, 0);
+            while b > 0 {
+                let tmp = a / b;
+                a -= tmp * b;
+                swap(&mut a, &mut b);
+                u -= tmp * v;
+                swap(&mut u, &mut v);
+            }
+            DynamicModInt::new::<i64>(u)
+        }
+    }
+
+    impl From<DynamicModInt> for Num {
+        fn from(m: DynamicModInt) -> Num {
+            m.value()
+        }
+    }
+
+    impl<T> AddAssign<T> for DynamicModInt
+    where
+        Num: From<T>,
+    {
+        fn add_assign(&mut self, rhs: T) {
+            let mut rhs = Num::from(rhs);
+            let m = modulo();
+            if rhs >= m {
+                rhs %= m;
+            }
+            self.0 += rhs;
+            if self.0 >= m {
+                self.0 -= m;
+            }
+        }
+    }
+
+    impl<T> Add<T> for DynamicModInt
+    where
+        Num: From<T>,
+    {
+        type Output = DynamicModInt;
+        fn add(self, rhs: T) -> Self::Output {
+            let mut res = self;
+            res += rhs;
+            res
+        }
+    }
+
+    impl<T> SubAssign<T> for DynamicModInt
+    where
+        Num: From<T>,
+    {
+        fn sub_assign(&mut self, rhs: T) {
+            let mut rhs = Num::from(rhs);
+            let m = modulo();
+            if rhs >= m {
+                rhs %= m;
+            }
+            if rhs > 0 {
+                self.0 += m - rhs;
+            }
+            if self.0 >= m {
+                self.0 -= m;
+            }
+        }
+    }
+
+    impl<T> Sub<T> for DynamicModInt
+    where
+        Num: From<T>,
+    {
+        type Output = DynamicModInt;
+        fn sub(self, rhs: T) -> Self::Output {
+            let mut res = self;
+            res -= rhs;
+            res
+        }
+    }
+
+    impl<T> MulAssign<T> for DynamicModInt
+    where
+        Num: From<T>,
+    {
+        fn mul_assign(&mut self, rhs: T) {
+            let mut rhs = Num::from(rhs);
+            let m = modulo();
+            if rhs >= m {
+                rhs %= m;
+            }
+            self.0 *= rhs;
+            self.0 %= m;
+        }
+    }
+
+    impl<T> Mul<T> for DynamicModInt
+    where
+        Num: From<T>,
+    {
+        type Output = DynamicModInt;
+        fn mul(self, rhs: T) -> Self::Output {
+            let mut res = self;
+            res *= rhs;
+            res
+        }
+    }
+
+    impl<T> DivAssign<T> for DynamicModInt
+    where
+        Num: From<T>,
+    {
+        fn div_assign(&mut self, rhs: T) {
+            let mut rhs = Num::from(rhs);
+            let m = modulo();
+            if rhs >= m {
+                rhs %= m;
+            }
+            let inv = DynamicModInt(rhs).internal_pow(m - 2);
+            self.0 *= inv.value();
+            self.0 %= m;
+        }
+    }
+
+    impl<T> Div<T> for DynamicModInt
+    where
+        Num: From<T>,
+    {
+        type Output = DynamicModInt;
+        fn div(self, rhs: T) -> Self::Output {
+            let mut res = self;
+            res /= rhs;
+            res
+        }
+    }
+
+    pub trait ModuloPrimitive: Clone + Copy {
+        fn modulo() -> Num;
+        fn primitive_root() -> Num;
+    }
+
+    macro_rules! define_modulo_primitive {
+        ($name:ident, $mod:expr, $proot:expr) => {
+            #[derive(Debug, Clone, Copy)]
+            pub struct $name;
+            impl ModuloPrimitive for $name {
+                fn modulo() -> i64 {
+                    $mod
+                }
+                fn primitive_root() -> i64 {
+                    $proot
+                }
+            }
+        };
+    }
+
+    define_modulo_primitive!(Mod924844033, 924844033, 5);
+    define_modulo_primitive!(Mod998244353, 998244353, 3);
+    define_modulo_primitive!(Mod1012924417, 1012924417, 5);
+    define_modulo_primitive!(Mod167772161, 167772161, 3);
+    define_modulo_primitive!(Mod469762049, 469762049, 3);
+    define_modulo_primitive!(Mod1224736769, 1224736769, 3);
+
+    #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+    pub struct StaticModInt<M>(Num, PhantomData<M>);
+
+    impl<M: ModuloPrimitive> StaticModInt<M> {
+        pub fn new<T>(v: T) -> StaticModInt<M>
+        where
+            Num: From<T>,
+        {
+            let mut v = Num::from(v);
+            let m = M::modulo();
+            if v >= m {
+                v %= m;
+            }
+            if v < 0 {
+                v = (v % m + m) % m;
+            }
+            StaticModInt(v, PhantomData)
+        }
+
+        fn internal_pow(&self, mut e: Num) -> StaticModInt<M> {
+            let mut result = 1;
+            let mut cur = self.0;
+            let m = M::modulo();
+            while e > 0 {
+                if e & 1 == 1 {
+                    result *= cur;
+                    result %= m;
+                }
+                e >>= 1;
+                cur = (cur * cur) % m;
+            }
+            StaticModInt(result, PhantomData)
+        }
+
+        pub fn pow<T>(&self, e: T) -> StaticModInt<M>
+        where
+            Num: From<T>,
+        {
+            self.internal_pow(Num::from(e))
+        }
+
+        pub fn value(&self) -> Num {
+            self.0
+        }
+
+        pub fn inv(&self) -> Self {
+            let (mut a, mut b, mut u, mut v) = (self.0, M::modulo(), 1, 0);
+            while b > 0 {
+                let tmp = a / b;
+                a -= tmp * b;
+                std::mem::swap(&mut a, &mut b);
+                u -= tmp * v;
+                std::mem::swap(&mut u, &mut v);
+            }
+            StaticModInt::new::<Num>(u)
+        }
+    }
+
+    impl<M> Neg for StaticModInt<M>
+    where
+        M: ModuloPrimitive,
+    {
+        type Output = Self;
+        fn neg(self) -> Self::Output {
+            Self::new(M::modulo() - self.0)
+        }
+    }
+
+    impl<T, M> AddAssign<T> for StaticModInt<M>
+    where
+        Num: From<T>,
+        M: ModuloPrimitive,
+    {
+        fn add_assign(&mut self, rhs: T) {
+            let mut rhs = Num::from(rhs);
+            let m = M::modulo();
+            if rhs >= m {
+                rhs %= m;
+            }
+            self.0 += rhs;
+            if self.0 >= m {
+                self.0 -= m;
+            }
+        }
+    }
+
+    impl<M> AddAssign for StaticModInt<M>
+    where
+        M: ModuloPrimitive,
+    {
+        fn add_assign(&mut self, rhs: StaticModInt<M>) {
+            *self += rhs.value();
+        }
+    }
+
+    impl<T, M> Add<T> for StaticModInt<M>
+    where
+        Num: From<T>,
+        M: ModuloPrimitive,
+    {
+        type Output = StaticModInt<M>;
+        fn add(self, rhs: T) -> Self::Output {
+            let mut res = self;
+            res += rhs;
+            res
+        }
+    }
+
+    impl<M> Add for StaticModInt<M>
+    where
+        M: ModuloPrimitive,
+    {
+        type Output = StaticModInt<M>;
+        fn add(self, rhs: StaticModInt<M>) -> Self::Output {
+            let mut res = self;
+            res += rhs.value();
+            res
+        }
+    }
+
+    impl<M> Add<StaticModInt<M>> for Num
+    where
+        M: ModuloPrimitive,
+    {
+        type Output = StaticModInt<M>;
+        fn add(self, rhs: StaticModInt<M>) -> Self::Output {
+            let mut res = StaticModInt::<M>::new(self);
+            res += rhs.value();
+            res
+        }
+    }
+
+    impl<T, M> SubAssign<T> for StaticModInt<M>
+    where
+        Num: From<T>,
+        M: ModuloPrimitive,
+    {
+        fn sub_assign(&mut self, rhs: T) {
+            let mut rhs = Num::from(rhs);
+            let m = M::modulo();
+            if rhs >= m {
+                rhs %= m;
+            }
+            if rhs > 0 {
+                self.0 += m - rhs;
+            }
+            if self.0 >= m {
+                self.0 -= m;
+            }
+        }
+    }
+
+    impl<M> SubAssign for StaticModInt<M>
+    where
+        M: ModuloPrimitive,
+    {
+        fn sub_assign(&mut self, rhs: StaticModInt<M>) {
+            *self -= rhs.value();
+        }
+    }
+
+    impl<T, M> Sub<T> for StaticModInt<M>
+    where
+        Num: From<T>,
+        M: ModuloPrimitive,
+    {
+        type Output = StaticModInt<M>;
+        fn sub(self, rhs: T) -> Self::Output {
+            let mut res = self;
+            res -= rhs;
+            res
+        }
+    }
+
+    impl<M> Sub for StaticModInt<M>
+    where
+        M: ModuloPrimitive,
+    {
+        type Output = StaticModInt<M>;
+        fn sub(self, rhs: StaticModInt<M>) -> Self::Output {
+            let mut res = self;
+            res -= rhs.value();
+            res
+        }
+    }
+
+    impl<M> Sub<StaticModInt<M>> for Num
+    where
+        M: ModuloPrimitive,
+    {
+        type Output = StaticModInt<M>;
+        fn sub(self, rhs: StaticModInt<M>) -> Self::Output {
+            let mut res = StaticModInt::<M>::new(self);
+            res -= rhs.value();
+            res
+        }
+    }
+
+    impl<T, M> MulAssign<T> for StaticModInt<M>
+    where
+        Num: From<T>,
+        M: ModuloPrimitive,
+    {
+        fn mul_assign(&mut self, rhs: T) {
+            let mut rhs = Num::from(rhs);
+            let m = M::modulo();
+            if rhs >= m {
+                rhs %= m;
+            }
+            self.0 *= rhs;
+            self.0 %= m;
+        }
+    }
+
+    impl<M> MulAssign for StaticModInt<M>
+    where
+        M: ModuloPrimitive,
+    {
+        fn mul_assign(&mut self, rhs: StaticModInt<M>) {
+            *self *= rhs.value();
+        }
+    }
+
+    impl<T, M> Mul<T> for StaticModInt<M>
+    where
+        Num: From<T>,
+        M: ModuloPrimitive,
+    {
+        type Output = StaticModInt<M>;
+        fn mul(self, rhs: T) -> Self::Output {
+            let mut res = self;
+            res *= rhs;
+            res
+        }
+    }
+
+    impl<M> Mul for StaticModInt<M>
+    where
+        M: ModuloPrimitive,
+    {
+        type Output = StaticModInt<M>;
+        fn mul(self, rhs: StaticModInt<M>) -> Self::Output {
+            let mut res = self;
+            res *= rhs.value();
+            res
+        }
+    }
+
+    impl<M> Mul<StaticModInt<M>> for Num
+    where
+        M: ModuloPrimitive,
+    {
+        type Output = StaticModInt<M>;
+        fn mul(self, rhs: StaticModInt<M>) -> Self::Output {
+            let mut res = StaticModInt::<M>::new(self);
+            res *= rhs.value();
+            res
+        }
+    }
+
+    impl<T, M> DivAssign<T> for StaticModInt<M>
+    where
+        Num: From<T>,
+        M: ModuloPrimitive,
+    {
+        fn div_assign(&mut self, rhs: T) {
+            let mut rhs = Num::from(rhs);
+            let m = M::modulo();
+            if rhs >= m {
+                rhs %= m;
+            }
+            let inv = StaticModInt::<M>(rhs, PhantomData).internal_pow(m - 2);
+            self.0 *= inv.value();
+            self.0 %= m;
+        }
+    }
+
+    impl<M> DivAssign for StaticModInt<M>
+    where
+        M: ModuloPrimitive,
+    {
+        fn div_assign(&mut self, rhs: StaticModInt<M>) {
+            *self /= rhs.value();
+        }
+    }
+
+    impl<T, M> Div<T> for StaticModInt<M>
+    where
+        Num: From<T>,
+        M: ModuloPrimitive,
+    {
+        type Output = StaticModInt<M>;
+        fn div(self, rhs: T) -> Self::Output {
+            let mut res = self;
+            res /= rhs;
+            res
+        }
+    }
+
+    impl<M> Div for StaticModInt<M>
+    where
+        M: ModuloPrimitive,
+    {
+        type Output = StaticModInt<M>;
+        fn div(self, rhs: StaticModInt<M>) -> Self::Output {
+            let mut res = self;
+            res /= rhs.value();
+            res
+        }
+    }
+
+    impl<M> Div<StaticModInt<M>> for Num
+    where
+        M: ModuloPrimitive,
+    {
+        type Output = StaticModInt<M>;
+        fn div(self, rhs: StaticModInt<M>) -> Self::Output {
+            let mut res = StaticModInt::<M>::new(self);
+            res /= rhs.value();
+            res
+        }
+    }
+}
